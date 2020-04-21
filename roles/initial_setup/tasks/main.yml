@@ -1,0 +1,44 @@
+---
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: create a new user and add it to the sudo group
+  user:
+    name: "{{ setup_user }}"
+    group: wheel
+    shell: /bin/bash
+
+- name: Set authorized key for user {{ setup_user }} copying it from current user
+  authorized_key:
+    user: "{{ setup_user }}"
+    state: present
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+ 
+- name: Make sure SSH is allowed within UFW
+  ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: Deny other incoming traffic by default 
+  ufw:
+    state: enabled
+    direction: incoming
+    policy: deny
+
+- name: Update repositories cache and install system packages
+  apt:
+    name: "{{ sys_packages }}"
+    update_cache: yes
+  tags:
+    - apt
+

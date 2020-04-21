@@ -1,0 +1,16 @@
+---
+- name: Install PHP-FPM
+  apt:
+    name: php-fpm
+    state: latest
+
+- name: Install additional PHP packages
+  apt:
+    name: "{{ install_packages}}"
+    state: latest
+
+- name: Set Up php test page
+  template:
+    src: phpinfo.php.j2
+    dest: /var/www/html/info.php
+

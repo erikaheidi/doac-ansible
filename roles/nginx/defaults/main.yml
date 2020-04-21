@@ -1,0 +1,3 @@
+---
+http_port: 80
+http_host: "{{ ansible_facts.eth0.ipv4.address }}"

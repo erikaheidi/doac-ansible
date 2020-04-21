@@ -1,0 +1,14 @@
+---
+- name: Install MariaDB and Python3 MySQL module
+  apt:
+    name: [  "mysql-server", "python3-pymysql" ]
+    state: latest
+
+- name: Removes anonymous MySQL accounts
+  mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  no_log: true
+

@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - initial_setup
+    - nginx
+    - php
+    - mariadb
