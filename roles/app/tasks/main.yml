@@ -1,0 +1,5 @@
+---
+- name: Set up the index.php file based on a template
+  template:
+    src: index.php.j2
+    dest: /var/www/html/index.php

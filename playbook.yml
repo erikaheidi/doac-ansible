@@ -6,4 +6,5 @@
     - { role: nginx, tags: ["nginx", "lemp"] }
     - { role: php, tags: ["php", "lemp"] }
     - { role: mariadb, tags: ["mariadb", "lemp"] }
-    - { role: composer, tags: ["composer"] }  
+    - { role: composer, tags: ["composer"] }
+    - { role: app, tags: ["app"] }  

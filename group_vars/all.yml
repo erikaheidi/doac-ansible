@@ -1,0 +1,4 @@
+---
+mysql_database: todo_app
+mysql_user: todo_user
+mysql_pass: YOUR_MYSQL_PASSWORD

@@ -12,3 +12,31 @@
     login_unix_socket: /var/run/mysqld/mysqld.sock
   no_log: true
 
+- name: Create a new database for the application
+  mysql_db:
+    name: "{{ mysql_database }}"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create database user for the todo_list app
+  mysql_user:
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_pass }}"
+    priv: "{{ mysql_database }}.*:ALL"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  no_log: true
+
+  
+ # Copy database dump file to remote host and restore it to database 'my_db'
+- name: Copy database dump file
+  copy:
+    src: todo_dump.sql
+    dest: /tmp
+
+- name: Restore database
+  mysql_db:
+    name: "{{ mysql_database }}"
+    state: import
+    target: /tmp/todo_dump.sql
+    login_unix_socket: /var/run/mysqld/mysqld.sock
