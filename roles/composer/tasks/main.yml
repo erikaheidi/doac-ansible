@@ -1,0 +1,27 @@
+---
+- name: Checks if Composer already exists before downloading / installing
+  command: /usr/local/bin/composer
+  register: composer_exists
+  ignore_errors: true
+
+- name: Installs Composer
+  block:
+    - name: Download Composer installation script
+      get_url:
+        url: https://getcomposer.org/installer
+        dest: /tmp/composer-setup.php
+
+    - name: Install Composer
+      shell: /usr/bin/php composer-setup.php
+      args:
+        chdir: /tmp
+        creates: composer.phar
+
+    - name: Copy Composer executable
+      copy:
+        src: /tmp/composer.phar
+        dest: /usr/local/bin/composer
+        mode: '0755'
+        remote_src: yes
+        
+  when: composer_exists is failed

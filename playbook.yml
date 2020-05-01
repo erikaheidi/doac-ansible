@@ -2,7 +2,8 @@
 - hosts: all
   become: true
   roles:
-    - initial_setup
-    - nginx
-    - php
-    - mariadb
+    - { role: initial_setup, tags: ["setup"] }
+    - { role: nginx, tags: ["nginx", "lemp"] }
+    - { role: php, tags: ["php", "lemp"] }
+    - { role: mariadb, tags: ["mariadb", "lemp"] }
+    - { role: composer, tags: ["composer"] }  
