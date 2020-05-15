@@ -1,0 +1,266 @@
+Hello!
+
+In the third part of this series, We'll create a basic LEMP playbook.
+
+
+To get started, let's create a couple new servers and run the initial server setup playbook we've created in the last episode. this will create a basic sudo user on the server, and it will also active the UFW firewall.
+
+
+Next, let's create the inventory file for these servers. We'll include a special declaration in our inventory to set the default Python interpreter on the remote nodes to Python 3, instead of the default Python 2 which is used by Ansible for backwards compatibility reasons.
+
+
+Everything is set, we can now run playbooks on these nodes. Let's run the initial server setup playbook now.
+
+
+Both servers now are set up with a sudo user named "erika", and the firewall is enabled, allowing only SSH access.
+
+
+
+We can now start creating the LEMP playbook. Let's start with the basics: install the packages nginx, mariadb (mysql), php-fpm, php-mysql.
+
+we'll use a variable and a task loop for that.
+
+
+
+Because we have enabled the firewall within the initial server setup playbook, we'll need to run a task to allow access on port 80. Let's check the ufw Ansible module.
+
+
+
+We'll probably need a few other things, but we can already try this playbook. Let's give it a run.
+
+
+Installing packages takes some time, so hang on :)
+
+
+no errors, everything looks good. if we access these servers from the browser now, we should be able to see the nginx welcome page. let's try that.
+
+
+Cool! we have nginx running, and the packages were all successfully installed. but we still need to configure nginx to handle PHP.
+
+
+
+we'll need to use the template module for that. let's check the ansible docs for the template module!
+
+
+Lets create an nginx template. I'll copy (a basic) one from a lemp tutorial.
+
+we've defined a couple variables in the template. we should set these variables in the playbook.
+
+
+let's create the template task now.
+
+
+we'll have to double check the php-fpm socket file to make sure the template is pointing to the right one.
+
+
+
+so, there are many options here - we can create a new server block configuration or we can overwrite the default configuration. to keep things simple, we'll overwrite the default nginx conf file here. 
+
+
+
+Another thing we'll have to do is to reload / restart Nginx (I think a reload will do it) after we change the configuration. in order to do that, we'll have to create a HANDLER.
+
+
+
+handlers are used to manage services. you can create multiple handlers in your playbook, for each action and each service you'll be managing. we'll only need a restart handler for now, so lets create this.
+
+
+
+Let's peek at the documentation for a refresh!
+
+Ok, we'll try this now. well, actually - before that - we'll need a PHP script to test if the task and playbook worked after all. let's create this already. we can use a phpinfo() call .
+
+
+Now, instead of the template module, we'll use another module to copy this script to the remote server.
+
+
+to define the server_name configuration, we'll use a system fact - facts come as global variables that you can access from your playbooks, containing information about the (remote) system.
+
+we'll need the ipv4 address of the eth0 network interface. 
+
+system facts can be accessed with the -m setup module - its a long json with a bunch of info.
+
+
+what we want is
+
+ansible_eth0.ipv4.address
+
+
+
+
+Let's try this playbook now and see what happens (:
+
+
+I've run on only one server so we can test first and if it works we'll run on the other one too :) this is what you should do with real life servers :D
+
+
+ohh something is wrong! the info.php script is there, but the browser sent it for download instead of showing what we expected.
+
+we have to check nginx configuration.
+
+
+it works! it was just the name of the configuration file. since it was different, it didn't overwrite the default one.
+
+
+
+our basic LEMP playbook is now finished, but there are definitely more tasks we could include there. creating db users and databases, for instance, is a common thing to include. 
+
+
+let's have a look at the mysql_user ansible module, so you have an idea of how to do that. we'll remove the anonymous users from the database, a common task when securing mysql servers.
+
+In order to use this module, we'll need a new package. pymysql for python 3. let's include this in the packages variable.
+
+
+
+this task is ok but it would fail because it's missing mysql credentials.
+
+
+On new Linux and MySQL versions (5.7+), the root MySQL account uses a socket_auth authentication method, which is based on a local socket - you can only connect as root from localhost. this is an important security measure.
+
+
+we'll need to include the auth_socket directive to this task.
+
+
+I've copied the default socket location from another playbook because I couldn't remember from the top of my mind :)
+
+
+let's run this playbook again, now on both servers. 
+
+
+this warning shows up when you have tasks that set passwords and such, since they can show up on ansible logs. to suppress this (and avoid passwords to be logged), you should include "no_log: true" to the task that triggers this warning.
+
+
+Both servers are now configured for LEMP. in the next parts of this series, we'll improve this setup, turn our playbooks into roles, and we'll also create a Composer playbook / role to improve your LEMP setup.
+
+
+cheers!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

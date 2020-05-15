@@ -1,0 +1,7 @@
+DevOps & Chill n.5 - Using Conditionals in Ansible Roles
+
+In this episode, we'll create a new Composer role and use conditionals to control task execution.
+
+We'll work with Ubuntu 18.04 servers, reusing our Initial Server Setup and our LEMP roles.
+
+

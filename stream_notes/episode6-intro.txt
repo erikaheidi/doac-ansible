@@ -1,0 +1,7 @@
+DevOps & Chill n.6 - Using Ansible Vault to Protect Sensitive Data
+
+In this episode, we'll update the MySQL Role to create a new database and user, then we'll use Ansible Vault to protect these important credentials :) 
+
+We'll work with Ubuntu 18.04 servers, on top of the roles we've already created in previous episodes.
+
+

@@ -1,0 +1,8 @@
+DevOps & Chill n.1 - Installing and Configuring Ansible on Ubuntu 18.04
+
+In this episode, we'll start a new Ansible setup with:
+
+- One Ubuntu 18.04 server as control node
+- Two Ubuntu 18.04 servers as managed nodes
+
+

@@ -1,0 +1,294 @@
+hello!
+
+
+let's start by having a look at what we already have in terms of roles and structure.
+
+
+we'll create a new role to install Composer. Let's get started.
+
+
+let's have a look at the Composer installation instructions.
+
+
+Even though Ansible has a "Composer" module, we need to install Composer globally before we can use that module. We'll use raw bash commands to get Composer installed.
+
+
+
+maybe we can use the "get_url" Ansible module to download the Composer install script. Let's see if that works! 
+
+
+
+maybe we can use the checksum parameter, but let's start with a basic download to a known location (/tmp) in order to be able to run the install script on the server. we'll iterate from there.
+
+
+
+now is a good time to create a couple servers. this time I'm going to use a command line tool for that, just because it's easier for me.
+
+
+even though this is a lot quicker than creating from the UI, I just remembered I would have to copy over my stargate SSH key to that server. So I'll go ahead and use the browser UI to create a couple droplets with my stargate SSH key :D
+
+
+
+
+I'll set up a new inventory file for these servers.
+
+
+
+I've set an inventory with two groups: "dev" and "test". Let's run a "ping" command to make sure we're able to connect and run commands on those nodes.
+
+we're good to go. now, I'd like to run the initial server setup role and the LEMP roles in those servers.
+
+
+
+Once the execution is finished, we'll have two LEMP servers ready. Then, I'll start testing the new Composer role on those.
+
+
+
+ok, so the servers are ready to serve PHP with Nginx. we can now start playing around with the Composer role.
+
+
+
+To get started, we'll download the composer install script.
+
+Now, we'll create a task to execute it. We'll use the shell module - I always confuse this! :D it's SHELL, not bash.
+
+
+So, these two tasks will:
+- download composer install script
+- execute the install script, only when a "composer.phar" file is not already on /tmp
+
+
+we still have to copy "composer.phar" to another location, but let's run this to see if any problems will emerge. better sooner than later :D
+
+
+first, I reorganized our playbook so that we define TAGS for each role. this way, we can control the playbook execution in order to skip tags or only execute specific tags. We'll only run the composer role from now on, since we've already run the other roles.
+
+
+both tasks in the composer role were executed without errors. so, if you log in now, we should be able to see a "composer.phar" file in `/tmp`.
+
+
+
+but let's go ahead and create a new task to move this file into a more permanent location. we want to install composer globally, so we should move it into "/usr/local/bin/composer". ;) forgot /bin
+
+
+Let's try this now!
+
+
+we got an error because there's currently no group named "sammy". I'll try this again with the default file ownership!
+
+
+
+
+oops! nothing change, because the file was copied already, the only thing that didn't happen in the last run was the ownership change. so this should already give us the composer executable globally installed. let's check
+
+
+
+our composer MVP is kinda working. well, it is working, but we should remove those .phar and setup files from /tmp - not a biggie, but we can include a task for doing that.
+
+
+the problem is that if we remove the files (which will end up happening anyways because this is /tmp), the download task will run again. a solution is checking if we already have composer installed on /usr/local/bin, and if so, we shouldn't need to run all these tasks to install composer! because it's already there......
+
+
+
+
+a practical way to do so is by using conditionals. In Ansible, we define variables to be used with a condition. A condition is set with the keyword "WHEN". 
+
+
+There are many ways to work with conditionals, but we'll see one way to check the output of a command and then "save" this into a variable. then we can test that variable and only execute a task (or block) in case that variable has a certain value or "status" (like, failed)
+
+
+when using a conditional like this, we NEED to include a "ignore_errors = true" in the task, otherwise the playbook is gonna fail with the execution of a command that doesn't exist / return error.
+
+
+
+
+
+lets see this in practice
+
+
+
+another feature we can use here is BLOCKS. instead of repeating the "WHEN" condition for all tasks, we can create a block and use the conditional only once. If it passes, the whole block of tasks is executed.
+
+
+Let's try this now. all tasks should be skipped, because composer is already located at /usr/local/bin.
+
+
+it seems it worked! now, to make sure, let's remove composer and run the playbook again, to guarantee the the tasks will be executed when its not already installed.
+
+
+I'll do it only on one of the servers, so we can compare.
+
+
+
+
+As you could see, on one of the servers, the /usr/local/bin/composer command failed (as expected), and that triggered the execution of the block that downloads and installs composer. the other server, at the other hand, skipped all tasks, because it already had composer installed.
+
+
+
+aaaand that is one way you can use conditionals to make your playbooks smarter!!!
+
+
+For this Composer role to be complete, there are a few improvements to be done:
+
+- implement the checksum test
+- remove the .phar and setup scripts from /tmp
+
+
+I'll update this and commit the new Composer role later (next week) along with the edited version of this stream.
+
+
+keep an eye on my twitter (@erikaheidi) for that! 
+
+
+
+
+
+so, we come to the end of the stream. Thanks for watching, and if you have any questions feel free to ping me on twitter. hope to "see" you next Friday!
+
+
+
+cheers o/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

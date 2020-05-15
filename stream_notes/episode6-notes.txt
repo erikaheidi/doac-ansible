@@ -1,0 +1,312 @@
+To get started, let's first have a look at the roles and structure we already have, then check the MySQL role in more detail.
+
+
+Our current MariaDB (Mysql drop-in replacement) role is pretty bare. We just install the server and remove annonymous accounts from it.
+
+
+we'll now have a look at the Ansible MySQL modules to create a new database for our fictional application, and also create a new user.
+
+
+Let's start by creating a new database, using the mysql_db module.
+
+
+
+very original app demo :D if we have time we can copy some code over to make a little todo app
+
+
+
+Next, let's create a new user and grant them full privileges over the todo app database
+
+
+
+We must remember to use the unix_socket auth method to authenticate as the MySQL root user in order to create the user and DB.
+
+
+
+
+We have the tasks in place, now lets create a couple droplets to run this.
+
+
+We'll set up a new inventory file now and test connection.
+
+
+
+We are now ready to run playbooks on these servers. Let's first adjust the MariaDB role so that it uses a variable instead of having a static password set at the task level.
+
+
+
+A word about group_vars: Ansible automatically loads variable files located in the group_vars directory, as long as they have a known name - the files should be named after the group that is the target of the play execution. You'll also usually have an `all.yml` file, which works as a default place to look for variables.
+
+
+This is used to create per-environment or per-group settings, like having separate var files for a dev / staging / test / prod environments. Basically, you'll put all your default values on a `all.yml` file, and create per-group files to overwrite these default values on a per-group basis
+
+The names of the files/ groups should be based on your inventory file. Our inventory file now has a "dev" and a "test" groups. We can create these files later to overwrite the default values I'm defining on the all.yml file. We'll start with that
+
+
+
+
+
+We are all set now. But let's run the playbook only on one group of servers (there's just one server, but anyways) - the DEV group. So, later on, we'll use ansible vault to encrypt the variable files and test the role again on the other group (TEST).
+
+
+
+Our DB user was created, and the db was also created (probably, from the output of the play) but the privilege assignement was probably wrong, let's fix that.
+
+
+
+OK, fixed. So everything is working as expected. Now, you wouldn't commit these files as-is to a repository, right?!?!
+
+We need to protect the database credentials. For that, we can use Ansible Vault. its usage is quite simple, let's see that now.
+
+
+Well, that's pretty much it :D you'll have to set up a password and remember that password later (of course) whenever you need to run playbooks that use those variables.
+
+
+Let's see the other vault commands - how to view and edit that file once encrypted. Then, we'll create a new variable file to customize those values for the "TEST" group (could be "PROD" likewise but thats what we've set up in our inventory initially so lets just go with it)
+
+
+We have now set up:
+- a `all.yml` variable file that has default values
+- a `test.yml` variable file that will overwrite values in `all.yml`, ONLY FOR THE "test" group. 
+
+
+We'll now run the playbook on the test group, and later on we'll log in to that server to make sure the mysql password was picked up from the test.yml file as expected.
+
+
+OH YES almost forgot - now we need to pass along the --ask-vault-pass option when running the playbook :)
+
+
+
+Installing packages / updating apt sometimes takes a bit longer :)
+
+So as you could see, the right group_var file was automatically selected based on the group we chose when running the playbook (with the -l option - limit execution)
+
+
+
+
+Now we can maybe increment a bit our mariadb role. Let's import a little sql dump to have something up and running that we can play with?
+
+
+
+
+Let me get something we can work with...
+
+
+
+
+
+
+I don't know if this is gonna work LOL
+
+
+let's try now
+
+
+YAY! it worked
+
+
+
+
+well, the most difficult part is done so we can have a little todo_list.php script, as a treat, right?
+
+
+
+
+we can copy / rsync/ template this file over to the remote server. I think a copy is just fine, oh wait - we'll need to obtain the db credentials so this is got to be a template, so we can use variables inside. let's start by creating the script, I have one ready I can copy
+
+
+
+
+we just created a new role for the application - "app". I've included a new template, using variables that we defined for the database.
+
+we created a task to set the template on /var/www/html, as configured within Nginx as document root.
+
+
+
+We'll run this now. There s a chance we might get a missing php-mysql module error, cant remember now if this was installed, lets seeeee!
+
+
+
+
+hahahah see, i knew it. We still don't have php-mysql installed apparently. this should be in the php role probably. lets include it there
+
+
+
+
+
+
+
+ IT WOOOOOOOOOORKs
+
+
+
+
+restarting wasnt necessary apparently :)
+
+
+
+
+let's check the other server too
+
+
+
+
+Success :) we now have a fully working tiny todo-list php demo app within this provisioning examples / roles / etc. 
+
+
+
+Thanks for watching, and if you have any questions you can find me on twitter - @erikaheidi
+
+
+
+
+I'll be posting the updated roles / files in the github repo soon.
+
+
+cheers, see ya!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

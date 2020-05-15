@@ -1,0 +1,10 @@
+DevOps & Chill n.4 - Creating Ansible Roles
+
+In this episode, we'll turn the playbooks we've created in the last two episodes into Ansible Roles.
+
+These are the roles we'll work on:
+
+- Initial Server Setup
+- LEMP
+
+Both targetting Ubuntu 18.04 servers.

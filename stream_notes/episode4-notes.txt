@@ -1,0 +1,237 @@
+Let's start by checking the playbooks we have created before.
+
+
+
+What are Roles anyways?!?
+
+A role is basically a set of tasks / templates / files / handlers / and other artifacts organized in a pre-defined way. Ansible knows where to find these files, so it facilitates writing automation.
+
+It also facilitates sharing these with other users, and reusing said automation for other purposes / other servers etc.
+
+We'll create a directory structure to organize our current playbooks into roles.
+
+Let's start with the initial server setup playbook, which from now on is going to be "initial_setup", a role!
+
+
+The minimal structure required for a role has a "tasks" directory, and a "main.yml" file inside it. this is where our tasks will live.
+
+
+The task file inside a role is different from a playbook because it doesn't need the metadata associated with a playbook, it also doesn't have handlers and such. it's just the tasks.
+
+
+We'll edit the playbook we copied now, and remove the parts that we don't need.
+
+
+This role is almost ready. Next, we can set up a few default variables to go with the role tasks - remember we had a couple variables defined in the "vars" section of this playbook? This should go now on the main playbook that will call this role. However, we can still set a few default values for this role, so in case the user forgets to define these variables in the playbook that will work as entry point, there are still some default values already defined. 
+
+
+
+You can do that with the "defaults" directory. Let's have a look at the Role docs to see how a full role structure looks like!
+
+
+
+
+Now we can create a playbook to test this role. A playbook that uses roles looks a lot more simpler than what we've seen before, because you'll just include the roles and that's it! 
+
+
+
+
+Ok this looks nice but we still have to test this to make sure it works (:
+
+
+Ill create a couple droplets now
+
+
+
+Lets set up a new inventory file
+
+
+
+I'll now do a quick test using the ping module to make sure we're able to connect to the nodes using Ansible.
+
+
+Cool, we have our nodes, we have our inventory ready, now lets run that sweet playbook.
+
+
+
+"TAGS" should be set at the task level, it's not an apt option.
+
+
+
+
+The Initial Setup role works! :) now we'll set up the LEMP role. this will have a few more components: a template file to set up Nginx, and another template file to set up a php test script. 
+
+
+
+Let's have another look at the Roles documenttion!
+
+
+
+As you can see, the LEMP role is a bit more "complex" because it has more moving parts. But that's pretty much it..... now, I'll have to make just a couple adjustments to the main tasks file, to make sure that nobody can overwrite the packages that are required by that setup.
+
+
+
+the way it is right now, the packages are set up as a variable, and this can be overwritten. Lets do the following: well create a task to install the mandatory packags, and this wont be a variable. But well set up also another task to install additional php modules that a user might want to install.
+
+
+
+
+althought we can still break down this lemp role into smaller portions, and maybe multiple roles (nginx, php, mariadb), lets keep it simple for now and add it to the entry point playbook. we can improve it later!
+
+
+
+package installation is always what takes longer! hang on in there
+
+
+
+shall we see if it worked? of course??
+
+
+
+
+Our roles are working like a charm \o/
+
+
+
+
+we can start breaking the LEMP role down a bit more. Lets separate nginx, mariadb and PHP into their own roles.
+
+
+
+we'll need to break down this into separate tasks to install each part of the stack. it pays at the end, because you can reuse your nginx role with different setups. sometimes it's not worth it, but overall it's a good practice to separate these into smaller roles.
+
+
+
+
+we have organized the LEMP role into multiple, smaller roles. we'll make a quick test now to see if things are ok overall, then we can try on fresh servers.
+
+
+
+
+we didnt get any errors, so this is great! it means things are where they're supposed to be. but nothing changed on the servers because they were already set up. we can try these on a fresh new server to make sure it works as expected :)
+
+
+
+
+now I'm running this ONLY on the *test* group I just created, with the new node. the "-l test" option on the ansible-playbook command will limit execution to that group. I'm also including the "-u root" option because as this is a new server, it only has the root account.
+
+
+
+
+aaaaaaaaaaaaand... it works! :)
+
+
+
+
+
+So, we've separated our big LEMP role into smaller roles, and everything worked as expected. Next week I'll be sharing these files and also the recording of this stream on Youtube if you'd like to watch it again in a faster pace. Keep an eye on my twitter to get access to that - and remember, if you have any questions feel free to ping me there: @erikaheidi
+
+
+
+
+thanks for joining me today, and I hope to "see":D you next time! Cheers!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

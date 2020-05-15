@@ -1,0 +1,11 @@
+Episode 3 - Automating LEMP setup on Ubuntu 18.04
+
+Today we'll create a playbook to automate setting up a LEMP server on Ubuntu 18.04
+
+Steps we need to automate:
+
+* Install Nginx
+* Install PHP-FPM
+* Install MySQL 
+* Set Up Nginx to use php-fpm
+* Allow HTTP within UFW

@@ -1,0 +1,217 @@
+Hello!!!!
+
+This is the first episode of DevOps & Chill, where we'll get everything set up for the next episodes.
+
+We'll start by installing Ansible on a fresh server (Ubuntu 18.04), then we'll set up a new SSH key to use with the nodes we'll create afterwards.
+
+The nodes will only be accessible via this special SSH key from the control server. This is a good approach instead of using your local machine for managing all your servers, because it limits access and it's easier to deal with multiple "deployer" users in case you have those.
+
+Let's start by creating a new Ubuntu 18.04 server.
+
+
+I added my SSH (public) key as authorized key / host for this server, so I can access it from my local machine. then, it will work as a "stargate" to my managed ansible nodes.
+
+
+First, we need to set up some basic stuff on this server, and then get ansible installed there. We'll follow the initial server setup guide for ubuntu 18.04
+
+
+We're logged in as root. This is the only account typically available on fresh new servers, and when you create a DigitalOcean droplet using your SSH key this is the default user that will have your key, then we can create a new "sudo" user and include the key for that user as well.
+
+
+
+OK, we now have a user, but it doesn't have sudo privileges yet. We'll fix that now
+
+
+
+
+To grant sudo privileges to a user, we just need to include this user in the "sudo" group (Ubuntu servers).
+
+
+
+Next, we need to copy our public key to the authorized_hosts of the new sudo user. There's an rsync command that already copies with correct permissions, let's use that shortcut
+
+
+The last thing we gotta do is enable the firewall for this server.
+
+
+We have successfully set up our server with a new sudo user, and also enabled the firewall. It's now good to install Ansible.
+
+
+
+We have added Ansible's official PPA repository, so now we can get the latest Ansible version installed on our server.
+
+
+Ansible is now installed! 
+
+The next step is to create a new inventory file. First, we'll need a couple servers. Let's create those now
+
+
+Oh, there's one more thing! We'll need a new SSH key set up for this server. This will ensure we have a *unique*, central place from where Ansible can reach the nodes (the ansible-control-node server). This new SSH key will be used exclusively by Ansible to control these nodes.
+
+
+
+Let's create this now!
+
+
+DigitalOcean's control panel lets you include your public ssh key in new droplets, so I'll do that now to facilitate setting up the initial access to my nodes.
+
+
+
+I will make a quick test to see if the SSH key was properly set, and access the nodes via SSH
+
+
+OK so now we have 3 nodes, ansible is installed, and the only thing left to do is to set up an INVENTORY FILE.
+
+
+The inventory file is where you list your managed nodes. You can set multiple inventory files, per-project inventories are usually a good practice to avoid messing around with the wrong servers.
+
+
+Let's create a new inventory file with 3 groups: dev, test, and prod
+
+
+
+Inventory files use a INI format usually. You can create groups, subgroups, and you can also just list your servers one per line, you can use IP or hosts.
+
+
+
+
+
+In addition to setting up the hosts, we will need to set up a variable to tell Ansible to use Python 3 on the remote nodes. This is because Ansible defaults to Python 2 for (backwards) compatibility reasons, but Ubuntu 18.04 servers have Python 3 only (by default).
+
+
+I think this is it - let's try a PING command on our dev group to test connection.
+
+
+
+Connection was successfull! now we can run commands, playbooks and whatnot on those servers.
+
+
+
+Let's try a few ad-hoc commands.
+
+
+
+Ad-hoc commands let you run one-off commands on your servers. In this example, I have installed `php-cli` on the `dev` group, so just one server has PHP installed now.
+
+
+That's wy in the last command we got a successfull `php -v` response, while the other two servers failed the command.
+
+
+Any module you use for writing playbooks can be also used with ad-hoc commands, but it's a bit messy to use Ansible like this - you can do some things, check statuses of services, and things like that, but it's always better to use playbooks for setting things up.
+
+
+In the next episodes of DevOps & Chill, we'll create playbooks and roles to set up a LEMP environment on Ubuntu 18.04.
+
+
+
+See you!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

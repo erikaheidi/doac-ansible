@@ -1,0 +1,8 @@
+Today we'll create a playbook to automate a initial server setup on Ubuntu
+
+Prerequisites: Ansible installed on a control node, one or more managed nodes set up in your inventory.
+
+Tasks we'll automate:
+  1. create user and add it to sudo group
+  2. copy local public key to remote user's authorized_keys
+  3. enable UFW firewall (allow SSH only)
